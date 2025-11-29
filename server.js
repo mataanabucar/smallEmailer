@@ -22,23 +22,29 @@ const transporter = nodemailer.createTransport({
 
 // Simple POST /send endpoint
 app.post('/send', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-
-    await transporter.sendMail({
-      from: `"${name || 'Contact Form'}" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_TO || process.env.EMAIL_USER,
-      replyTo: email,
-      subject: `New message from ${name || 'Website'}`,
-      text: message || '',
-    });
-
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Email error:', err);
-    res.status(500).json({ ok: false, error: 'Email failed' });
-  }
-});
+    try {
+      const { name, email, message } = req.body;
+  
+      await transporter.sendMail({
+        from: `"${name || 'Contact Form'}" <${process.env.EMAIL_USER}>`,
+        to: process.env.EMAIL_TO || process.env.EMAIL_USER,
+        replyTo: email,
+        subject: `New message from ${name || 'Website'}`,
+        text: message || '',
+      });
+  
+      res.json({ ok: true });
+    } catch (err) {
+      console.error('Email error:', err);
+      res.status(500).json({
+        ok: false,
+        error: err.message,
+        code: err.code,
+        response: err.response,
+      });
+    }
+  });
+  
 
 app.get('/', (req, res) => {
   res.send('Email API is running');
